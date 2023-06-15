@@ -7,16 +7,37 @@ const MainView = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    axios
-      .get(
-        "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json"
-      )
-      .then((response) => {
-        setPodcasts(response.data.feed.entry);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // Intentamos obtener los podcasts del almacenamiento local
+    const localStoragePodcasts = localStorage.getItem("podcasts");
+    const localStorageTimestamp = localStorage.getItem("timestamp");
+    const currentTime = new Date().getTime();
+
+    if (
+      localStoragePodcasts &&
+      localStorageTimestamp &&
+      currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
+    ) {
+      // Si los podcasts están en el almacenamiento local y son recientes, los utilizamos
+      setPodcasts(JSON.parse(localStoragePodcasts));
+    } else {
+      // Si no, obtenemos los podcasts de la API
+      axios
+        .get(
+          "https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json"
+        )
+        .then((response) => {
+          setPodcasts(response.data.feed.entry);
+          // Guardamos los podcasts en el almacenamiento local junto con el tiempo actual
+          localStorage.setItem(
+            "podcasts",
+            JSON.stringify(response.data.feed.entry)
+          );
+          localStorage.setItem("timestamp", currentTime.toString());
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }, []);
 
   const handleSearch = (event) => {
