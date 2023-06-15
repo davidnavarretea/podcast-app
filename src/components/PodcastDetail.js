@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
+import { useAppContext } from "../useAppContext";
 
 const PodcastDetail = () => {
+  // Manages the state for the podcast and episodes
   const [podcast, setPodcast] = useState({});
   const [episodes, setEpisodes] = useState([]);
+
+  // Retrieves the podcastId from URL parameters
   const { podcastId } = useParams();
 
+  // Retrieves the setLoading function from the app context
+  const { setLoading } = useAppContext();
+
   useEffect(() => {
+    // Sets the loading state to true
+    setLoading(true);
+
     const fetchPodcastDetail = async () => {
+      // Retrieves podcast details from local storage if they exist and are recent
       const localStoragePodcastDetail = localStorage.getItem(
         `podcastDetail-${podcastId}`
       );
@@ -17,25 +28,32 @@ const PodcastDetail = () => {
       );
       const currentTime = new Date().getTime();
 
+      // Checks if the podcast details exist in local storage and are still valid
       if (
         localStoragePodcastDetail &&
         localStorageTimestamp &&
         currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
       ) {
-        // Si los detalles del podcast están en el almacenamiento local y son recientes, los utilizamos
         const localData = JSON.parse(localStoragePodcastDetail);
         setPodcast(localData.podcast);
         setEpisodes(localData.episodes);
+
+        // Sets the loading state to false
+        setLoading(false);
       } else {
-        // Si no, obtenemos los detalles del podcast de la API
+        // Makes an API request to fetch the podcast details and episodes from the iTunes API
         const result = await axios.get(
           `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode&limit=9`
         );
+
         if (result.data.results && result.data.results.length > 0) {
+          // Sets the podcast state to the fetched podcast details
           setPodcast(result.data.results[0]);
+
+          // Sets the episodes state to the fetched episodes
           setEpisodes(result.data.results.slice(1));
 
-          // Guardamos los detalles del podcast en el almacenamiento local junto con el tiempo actual
+          // Stores the fetched podcast details and episodes in local storage
           localStorage.setItem(
             `podcastDetail-${podcastId}`,
             JSON.stringify({
@@ -48,10 +66,14 @@ const PodcastDetail = () => {
             currentTime.toString()
           );
         }
+
+        // Sets the loading state to false
+        setLoading(false);
       }
     };
+
     fetchPodcastDetail();
-  }, [podcastId]);
+  }, [podcastId, setLoading]);
 
   return (
     <div>
