@@ -81,7 +81,7 @@ const PodcastDetail = () => {
       <img src={podcast.artworkUrl100} alt={podcast.trackName} />
       <p>{podcast.artistName}</p>
       <p>{podcast.description}</p>
-      <h3>Episodios</h3>
+      <h3>{`Episodes: ${podcast.trackCount}`}</h3>
       {episodes.map((episode) => (
         <div key={episode.trackId}>
           <Link to={`/podcast/${podcastId}/episode/${episode.trackId}`}>
