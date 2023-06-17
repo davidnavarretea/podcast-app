@@ -1,0 +1,59 @@
+.searchDiv {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.2rem;
+    margin-right: 1rem;
+}
+
+.searchInput {
+    padding: 0.2rem;
+}
+
+.podcastLength {
+    color: white;
+    background-color: #007CC2;
+    display: inline;
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+    cursor: default;
+}
+
+.podcastGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.podcastCard {
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.podcastLink {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.podcastImage {
+    border-radius: 100%;
+}
+
+.title {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.artist {
+    font-size: 1rem;
+    text-align: center;
+}

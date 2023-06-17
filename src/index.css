@@ -19,4 +19,9 @@ code {
 
 a {
   text-decoration: none;
+  color: black;
+}
+
+a::after {
+  color: black;
 }

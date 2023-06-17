@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../useAppContext";
+import style from "../styles/MainView.module.css";
 
 const MainView = () => {
   // Manages the state for the podcasts and search term
@@ -76,16 +77,33 @@ const MainView = () => {
 
   return (
     <div>
-      <input type="text" onChange={handleSearch} placeholder="Buscar podcast" />
-      {filteredPodcasts.map((podcast, index) => (
-        <div key={index}>
-          <Link to={`/podcast/${podcast.id.attributes["im:id"]}`}>
-            <h2>{podcast.title.label}</h2>
-            <img src={podcast["im:image"][2].label} alt={podcast.title.label} />
-            <p>{podcast["im:artist"].label}</p>
-          </Link>
-        </div>
-      ))}
+      <div className={style.searchDiv}>
+        <p className={style.podcastLength}>{podcasts.length}</p>
+        <input
+          className={style.searchInput}
+          type="text"
+          onChange={handleSearch}
+          placeholder="Filter podcast..."
+        />
+      </div>
+      <div className={style.podcastGrid}>
+        {filteredPodcasts.map((podcast, index) => (
+          <div key={index} className={style.podcastCard}>
+            <Link
+              className={style.podcastLink}
+              to={`/podcast/${podcast.id.attributes["im:id"]}`}
+            >
+              <img
+                className={style.podcastImage}
+                src={podcast["im:image"][2].label}
+                alt={podcast.title.label}
+              />
+              <h2 className={style.title}>{podcast["im:name"].label}</h2>
+              <p className={style.artist}>{podcast["im:artist"].label}</p>
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
