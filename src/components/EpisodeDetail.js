@@ -37,8 +37,12 @@ const EpisodeDetail = () => {
       localStorageTimestamp &&
       currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
     ) {
-      setEpisode(JSON.parse(localStorageEpisodeDetail)); // Parse the stored episode data from local storage
-      setPodcast(JSON.parse(localStoragePodcastDetail)); // Parse the stored podcast data from local storage
+      try {
+        setEpisode(JSON.parse(localStorageEpisodeDetail)); // Parse the stored episode data from local storage
+        setPodcast(JSON.parse(localStoragePodcastDetail)); // Parse the stored podcast data from local storage
+      } catch (error) {
+        console.error("Error parsing data from local storage:", error);
+      }
       setLoading(false); // Set loading state to false
     } else {
       // If no valid local data, fetch from API
@@ -73,7 +77,7 @@ const EpisodeDetail = () => {
         })
         .catch((error) => {
           // Log any errors
-          console.error(error);
+          console.error("Error fetching data from API:", error);
           setLoading(false); // Set loading state to false
         });
     }

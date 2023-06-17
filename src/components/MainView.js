@@ -27,8 +27,13 @@ const MainView = () => {
       localStorageTimestamp &&
       currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
     ) {
-      // Sets the podcasts state to the cached podcasts
-      setPodcasts(JSON.parse(localStoragePodcasts));
+      try {
+        // Sets the podcasts state to the cached podcasts
+        setPodcasts(JSON.parse(localStoragePodcasts));
+      } catch (error) {
+        // Logs any errors that occur during JSON parsing
+        console.error("Error parsing podcasts from local storage:", error);
+      }
 
       // Sets the loading state to false
       setLoading(false);
@@ -54,7 +59,7 @@ const MainView = () => {
         })
         .catch((error) => {
           // Logs any errors that occur during the API request
-          console.error(error);
+          console.error("Error fetching podcasts from API:", error);
 
           // Sets the loading state to false
           setLoading(false);

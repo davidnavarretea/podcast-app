@@ -35,37 +35,50 @@ const PodcastDetail = () => {
         localStorageTimestamp &&
         currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
       ) {
-        const localData = JSON.parse(localStoragePodcastDetail);
-        setPodcast(localData.podcast);
-        setEpisodes(localData.episodes);
+        try {
+          const localData = JSON.parse(localStoragePodcastDetail);
+          setPodcast(localData.podcast);
+          setEpisodes(localData.episodes);
+        } catch (error) {
+          // Logs any errors that occur during JSON parsing
+          console.error(
+            "Error parsing podcast detail from local storage:",
+            error
+          );
+        }
 
         // Sets the loading state to false
         setLoading(false);
       } else {
-        // Makes an API request to fetch the podcast details and episodes from the iTunes API
-        const result = await axios.get(
-          `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`
-        );
-
-        if (result.data.results && result.data.results.length > 0) {
-          // Sets the podcast state to the fetched podcast details
-          setPodcast(result.data.results[0]);
-
-          // Sets the episodes state to the fetched episodes
-          setEpisodes(result.data.results.slice(1));
-
-          // Stores the fetched podcast details and episodes in local storage
-          localStorage.setItem(
-            `podcastDetail-${podcastId}`,
-            JSON.stringify({
-              podcast: result.data.results[0],
-              episodes: result.data.results.slice(1),
-            })
+        try {
+          // Makes an API request to fetch the podcast details and episodes from the iTunes API
+          const result = await axios.get(
+            `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`
           );
-          localStorage.setItem(
-            `podcastDetailTimestamp-${podcastId}`,
-            currentTime.toString()
-          );
+
+          if (result.data.results && result.data.results.length > 0) {
+            // Sets the podcast state to the fetched podcast details
+            setPodcast(result.data.results[0]);
+
+            // Sets the episodes state to the fetched episodes
+            setEpisodes(result.data.results.slice(1));
+
+            // Stores the fetched podcast details and episodes in local storage
+            localStorage.setItem(
+              `podcastDetail-${podcastId}`,
+              JSON.stringify({
+                podcast: result.data.results[0],
+                episodes: result.data.results.slice(1),
+              })
+            );
+            localStorage.setItem(
+              `podcastDetailTimestamp-${podcastId}`,
+              currentTime.toString()
+            );
+          }
+        } catch (error) {
+          // Logs any errors that occur during the API request
+          console.error("Error fetching podcast details from API:", error);
         }
 
         // Sets the loading state to false
