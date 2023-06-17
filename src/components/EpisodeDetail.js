@@ -5,14 +5,22 @@ import { useAppContext } from "../useAppContext";
 import style from "../styles/EpisodeDetail.module.css";
 
 const EpisodeDetail = () => {
+  // Using useParams to get the podcast and episode id's from the URL
   const { podcastId, episodeId } = useParams();
+
+  // Setting initial states for episode and podcast
   const [episode, setEpisode] = useState(null);
   const [podcast, setPodcast] = useState(null);
+
+  // Extracting the setLoading function from the App context
   const { setLoading } = useAppContext();
 
+  // UseEffect to make the API request when the component mounts
   useEffect(() => {
+    // Setting the loading state to true
     setLoading(true);
 
+    // Checking local storage for saved data
     const localStorageEpisodeDetail = localStorage.getItem(
       `episodeDetail-${episodeId}`
     );
@@ -22,47 +30,54 @@ const EpisodeDetail = () => {
     );
     const currentTime = new Date().getTime();
 
+    // If local storage has valid data, use it
     if (
       localStorageEpisodeDetail &&
       localStoragePodcastDetail &&
       localStorageTimestamp &&
       currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
     ) {
-      setEpisode(JSON.parse(localStorageEpisodeDetail));
-      setPodcast(JSON.parse(localStoragePodcastDetail)); // Load podcast data from local storage
-      setLoading(false);
+      setEpisode(JSON.parse(localStorageEpisodeDetail)); // Parse the stored episode data from local storage
+      setPodcast(JSON.parse(localStoragePodcastDetail)); // Parse the stored podcast data from local storage
+      setLoading(false); // Set loading state to false
     } else {
+      // If no valid local data, fetch from API
       axios
         .get(
           `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode&limit=9`
         )
         .then((response) => {
+          // Finding the specific episode from the API response
           const foundEpisode = response.data.results.find(
             (result) => result.trackId.toString() === episodeId
           );
-          setEpisode(foundEpisode);
-          setPodcast(response.data.results[0]);
 
+          setEpisode(foundEpisode); // Set the found episode to state
+          setPodcast(response.data.results[0]); // Set the podcast data to state
+
+          // Storing the fetched data to local storage
           localStorage.setItem(
             `episodeDetail-${episodeId}`,
             JSON.stringify(foundEpisode)
           );
           localStorage.setItem(
             `podcastDetail`,
-            JSON.stringify(response.data.results[0]) // Store podcast data in local storage
+            JSON.stringify(response.data.results[0])
           );
           localStorage.setItem(
             `episodeDetailTimestamp-${episodeId}`,
             currentTime.toString()
           );
-          setLoading(false);
+
+          setLoading(false); // Set loading state to false
         })
         .catch((error) => {
+          // Log any errors
           console.error(error);
-          setLoading(false);
+          setLoading(false); // Set loading state to false
         });
     }
-  }, [podcastId, episodeId, setLoading]);
+  }, [podcastId, episodeId, setLoading]); // Dependencies for useEffect
 
   return (
     <div className={style.container}>
@@ -89,7 +104,7 @@ const EpisodeDetail = () => {
               src={episode.episodeUrl}
               className={style.audioPlayer}
             >
-              Tu navegador no soporta el elemento de audio.
+              Your browser does not support the audio element.
             </audio>
           </div>
         </div>
