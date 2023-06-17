@@ -53,7 +53,7 @@ const PodcastDetail = () => {
         try {
           // Makes an API request to fetch the podcast details and episodes from the iTunes API
           const result = await axios.get(
-            `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`
+            `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode&limit=9`
           );
 
           if (result.data.results && result.data.results.length > 0) {
