@@ -1,0 +1,67 @@
+.container {
+    display: flex;
+    padding: 2rem;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.podcastCardLink {
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+
+.podcastCard {
+    border: 1px solid #eeeeee;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.podcastImage {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem;
+}
+
+.podcastTitle {
+    font-weight: bold;
+    margin: 1rem 0;
+}
+
+.podcastArtist {
+    color: #888888;
+}
+
+.episodeCard {
+    flex: 2;
+    border: 1px solid #eeeeee;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.episodeTitle {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.episodeDescription {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.audioPlayerContainer {
+    width: 100%;
+}
+
+.audioPlayer {
+    width: 100%;
+}

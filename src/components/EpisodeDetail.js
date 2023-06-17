@@ -1,91 +1,98 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useAppContext } from "../useAppContext";
+import style from "../styles/EpisodeDetail.module.css";
 
 const EpisodeDetail = () => {
-  // Retrieves the podcastId and episodeId from URL parameters
   const { podcastId, episodeId } = useParams();
-
-  // Manages the state for the episode details
   const [episode, setEpisode] = useState(null);
-
-  // Retrieves the setLoading function from the app context
+  const [podcast, setPodcast] = useState(null);
   const { setLoading } = useAppContext();
 
   useEffect(() => {
-    // Sets the loading state to true
     setLoading(true);
 
-    // Retrieves episode details from local storage if they exist and are recent
     const localStorageEpisodeDetail = localStorage.getItem(
       `episodeDetail-${episodeId}`
     );
+    const localStoragePodcastDetail = localStorage.getItem(`podcastDetail`);
     const localStorageTimestamp = localStorage.getItem(
       `episodeDetailTimestamp-${episodeId}`
     );
     const currentTime = new Date().getTime();
 
-    // Checks if the episode details exist in local storage and are still valid
     if (
       localStorageEpisodeDetail &&
+      localStoragePodcastDetail &&
       localStorageTimestamp &&
       currentTime - localStorageTimestamp < 24 * 60 * 60 * 1000
     ) {
-      // Sets the episode state to the cached episode details
       setEpisode(JSON.parse(localStorageEpisodeDetail));
-
-      // Sets the loading state to false
+      setPodcast(JSON.parse(localStoragePodcastDetail)); // Load podcast data from local storage
       setLoading(false);
     } else {
-      // Makes an API request to fetch the episode details from the iTunes API
       axios
         .get(
           `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode&limit=9`
         )
         .then((response) => {
-          // Finds the episode matching the given episodeId from the API response
           const foundEpisode = response.data.results.find(
             (result) => result.trackId.toString() === episodeId
           );
-
-          // Sets the episode state to the fetched episode details
           setEpisode(foundEpisode);
+          setPodcast(response.data.results[0]);
 
-          // Stores the fetched episode details in local storage
           localStorage.setItem(
             `episodeDetail-${episodeId}`,
             JSON.stringify(foundEpisode)
           );
           localStorage.setItem(
+            `podcastDetail`,
+            JSON.stringify(response.data.results[0]) // Store podcast data in local storage
+          );
+          localStorage.setItem(
             `episodeDetailTimestamp-${episodeId}`,
             currentTime.toString()
           );
-
-          // Sets the loading state to false
           setLoading(false);
         })
         .catch((error) => {
-          // Logs any errors that occur during the API request
           console.error(error);
-
-          // Sets the loading state to false
           setLoading(false);
         });
     }
   }, [podcastId, episodeId, setLoading]);
 
-  // Renders the episode details if they exist
   return (
-    <div>
+    <div className={style.container}>
+      {podcast && (
+        <Link to={`/podcast/${podcastId}`} className={style.podcastCardLink}>
+          <div className={style.podcastCard}>
+            <img
+              src={podcast.artworkUrl100}
+              alt={podcast.trackName}
+              className={style.podcastImage}
+            />
+            <h2 className={style.podcastTitle}>{podcast.trackName}</h2>
+            <p className={style.podcastArtist}>by {podcast.artistName}</p>
+          </div>
+        </Link>
+      )}
       {episode && (
-        <>
-          <h1>{episode.trackName}</h1>
-          <p>{episode.description}</p>
-          <audio controls src={episode.episodeUrl}>
-            Tu navegador no soporta el elemento de audio.
-          </audio>
-        </>
+        <div className={style.episodeCard}>
+          <h1 className={style.episodeTitle}>{episode.trackName}</h1>
+          <p className={style.episodeDescription}>{episode.description}</p>
+          <div className={style.audioPlayerContainer}>
+            <audio
+              controls
+              src={episode.episodeUrl}
+              className={style.audioPlayer}
+            >
+              Tu navegador no soporta el elemento de audio.
+            </audio>
+          </div>
+        </div>
       )}
     </div>
   );

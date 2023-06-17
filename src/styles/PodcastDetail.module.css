@@ -21,11 +21,13 @@
 .podcastTitle {
     font-weight: bold;
     margin: 0.5rem 0;
+    text-align: center;
 }
 
 .podcastArtist {
     color: #888;
     margin-bottom: 1rem;
+    text-align: center;
 }
 
 .podcastDescriptionTitle {
