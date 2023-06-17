@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import { useAppContext } from "../useAppContext";
+import style from "../styles/PodcastDetail.module.css";
 
 const PodcastDetail = () => {
   // Manages the state for the podcast and episodes
@@ -43,7 +44,7 @@ const PodcastDetail = () => {
       } else {
         // Makes an API request to fetch the podcast details and episodes from the iTunes API
         const result = await axios.get(
-          `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode&limit=9`
+          `https://itunes.apple.com/lookup?id=${podcastId}&entity=podcastEpisode`
         );
 
         if (result.data.results && result.data.results.length > 0) {
@@ -76,21 +77,37 @@ const PodcastDetail = () => {
   }, [podcastId, setLoading]);
 
   return (
-    <div>
-      <h2>{podcast.trackName}</h2>
-      <img src={podcast.artworkUrl100} alt={podcast.trackName} />
-      <p>{podcast.artistName}</p>
-      <p>{podcast.description}</p>
-      <h3>{`Episodes: ${podcast.trackCount}`}</h3>
-      {episodes.map((episode) => (
-        <div key={episode.trackId}>
-          <Link to={`/podcast/${podcastId}/episode/${episode.trackId}`}>
-            {episode.trackName}
-          </Link>
-          <p>{episode.releaseDate}</p>
-          <p>{episode.trackTimeMillis}</p>
+    <div className={style.container}>
+      <div className={style.podcastCard}>
+        <img
+          src={podcast.artworkUrl100}
+          alt={podcast.trackName}
+          className={style.podcastImage}
+        />
+        <h2 className={style.podcastTitle}>{podcast.trackName}</h2>
+        <p className={style.podcastArtist}>by {podcast.artistName}</p>
+      </div>
+
+      <div className={style.episodesSection}>
+        <div className={style.episodeCount}>
+          <h3>Episodes: {podcast.trackCount}</h3>
         </div>
-      ))}
+        <div className={style.episodeList}>
+          {episodes.map((episode, index) => (
+            <Link
+              to={`/podcast/${podcastId}/episode/${episode.trackId}`}
+              key={episode.trackId}
+              className={index % 2 === 0 ? style.episodeOdd : style.episodeEven}
+            >
+              <div className={style.episodeTitle}>{episode.trackName}</div>
+              <div className={style.episodeDate}>{episode.releaseDate}</div>
+              <div className={style.episodeDuration}>
+                {episode.trackTimeMillis}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
